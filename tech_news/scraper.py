@@ -2,13 +2,13 @@ import requests
 import time
 from parsel import Selector
 from bs4 import BeautifulSoup
+from tech_news.database import create_news
 
 
 # Requisito 1
 def fetch(url):
     time.sleep(1)
     try:
-
         response = requests.get(url, {"user-agent": "Fake user-agent"})
         response.raise_for_status()
         return response.text
@@ -71,4 +71,17 @@ def scrape_noticia(html_content):
 
 # Requisito 5
 def get_tech_news(amount):
-    """Seu código deve vir aqui"""
+    news = []
+    url = "https://blog.betrybe.com/"
+    while len(news) <= amount:
+        html = fetch(url)
+        content = scrape_novidades(html)
+        for new_url in content:
+            news_html = fetch(new_url)
+            news_content = scrape_noticia(news_html)
+            news.append(news_content)
+
+        url = scrape_next_page_link(html)
+
+    create_news(news[:amount])
+    return news[:amount]
