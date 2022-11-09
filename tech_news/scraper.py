@@ -1,6 +1,7 @@
 import requests
 import time
 from parsel import Selector
+from bs4 import BeautifulSoup
 
 
 # Requisito 1
@@ -37,7 +38,35 @@ def scrape_next_page_link(html_content):
 
 # Requisito 4
 def scrape_noticia(html_content):
-    """Seu código deve vir aqui"""
+
+    soup = BeautifulSoup(html_content, "html.parser")
+
+    url = soup.head.find("link", {"rel": "canonical"})["href"]
+    title = soup.body.h1.string
+    writer = soup.body.find("span", {"class": "author"}).string
+    timestamp = soup.body.find("li", {"class": "meta-date"}).string
+    comments_count = soup.body.find_all("ol", {"class": "comment-list"})
+    summary = soup.body.p.get_text()
+    tags = []
+    check_for_tags = soup.body.find("section", {"class": "post-tags"})
+    category = soup.body.find("span", {"class": "label"}).string
+
+    if check_for_tags:
+        for tag in soup.select("section.post-tags > ul > li > a"):
+            tags.append(tag.string)
+
+    news = {
+        "url": url,
+        "title": title.replace("\xa0", "").rstrip(),
+        "timestamp": timestamp,
+        "writer": writer,
+        "comments_count": len(comments_count),
+        "summary": summary.replace("\xa0", "").rstrip(),
+        "tags": tags,
+        "category": category,
+    }
+
+    return news
 
 
 # Requisito 5
