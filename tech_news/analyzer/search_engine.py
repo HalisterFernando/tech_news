@@ -41,7 +41,15 @@ def search_by_date(date):
 
 # Requisito 8
 def search_by_tag(tag):
-    """Seu código deve vir aqui"""
+    news_by_tag = db.find_news()
+    result = []
+    for news in news_by_tag:
+        for item in news["tags"]:
+            if tag.lower() == item.lower():
+                new_tuple = (news["title"], news["url"])
+                result.append(new_tuple)
+
+    return result
 
 
 # Requisito 9
