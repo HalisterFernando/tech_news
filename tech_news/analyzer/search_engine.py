@@ -54,4 +54,11 @@ def search_by_tag(tag):
 
 # Requisito 9
 def search_by_category(category):
-    """Seu código deve vir aqui"""
+    news_by_category = db.find_news()
+    result = []
+    for news in news_by_category:
+        if news["category"].lower() == category.lower():
+            new_tuple = (news["title"], news["url"])
+            result.append(new_tuple)
+
+    return result
